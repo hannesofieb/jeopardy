@@ -13,7 +13,8 @@
     }
 
     body {
-      min-height: 100vh;
+      height: 100vh;
+      overflow: hidden;
       background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 50%, #0a0a1a 100%);
       font-family: 'Bebas Neue', Impact, sans-serif;
       color: #fff;
@@ -182,19 +183,27 @@
     }
 
     /* Edit View Styles */
+    #edit-view, #play-view {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
     .edit-header, .play-header {
       display: flex;
       align-items: center;
       gap: 20px;
-      padding: 20px 30px;
+      padding: 15px 20px;
       background: rgba(0, 0, 0, 0.5);
       border-bottom: 2px solid #3366cc;
       flex-wrap: wrap;
+      flex-shrink: 0;
     }
 
     .back-button {
-      padding: 10px 20px;
-      font-size: 18px;
+      padding: 8px 15px;
+      font-size: 16px;
       font-family: 'Bebas Neue', Impact, sans-serif;
       letter-spacing: 2px;
       background: transparent;
@@ -202,13 +211,14 @@
       border-radius: 4px;
       color: #aaa;
       cursor: pointer;
+      white-space: nowrap;
     }
 
     .title-input {
       flex: 1;
-      min-width: 200px;
-      padding: 12px 20px;
-      font-size: 24px;
+      min-width: 150px;
+      padding: 10px 15px;
+      font-size: 20px;
       font-family: 'Bebas Neue', Impact, sans-serif;
       letter-spacing: 2px;
       background: rgba(255, 255, 255, 0.1);
@@ -224,8 +234,8 @@
     }
 
     .save-button {
-      padding: 12px 24px;
-      font-size: 18px;
+      padding: 10px 18px;
+      font-size: 16px;
       font-family: 'Bebas Neue', Impact, sans-serif;
       letter-spacing: 2px;
       background: linear-gradient(135deg, #228B22 0%, #006400 100%);
@@ -233,11 +243,12 @@
       border-radius: 4px;
       color: #fff;
       cursor: pointer;
+      white-space: nowrap;
     }
 
     .preview-button {
-      padding: 12px 24px;
-      font-size: 18px;
+      padding: 10px 18px;
+      font-size: 16px;
       font-family: 'Bebas Neue', Impact, sans-serif;
       letter-spacing: 2px;
       background: linear-gradient(135deg, #1a3a8a 0%, #0a1a4a 100%);
@@ -245,29 +256,44 @@
       border-radius: 4px;
       color: #FFD700;
       cursor: pointer;
+      white-space: nowrap;
     }
 
     .board-container {
-      padding: 30px;
-      overflow: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 15px 20px;
+      overflow: hidden;
     }
 
     .board {
+      flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      min-width: 800px;
+      gap: 4px;
     }
 
     .category-row, .question-row {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 6px;
+      display: flex;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .category-row {
+      flex: 0 0 auto;
+    }
+
+    .question-row {
+      flex: 1;
+      min-height: 0;
     }
 
     .category-input {
-      padding: 20px 10px;
-      font-size: 18px;
+      flex: 1;
+      min-width: 0;
+      padding: 12px 8px;
+      font-size: clamp(12px, 1.5vw, 18px);
       font-family: 'Bebas Neue', Impact, sans-serif;
       letter-spacing: 1px;
       text-align: center;
@@ -280,8 +306,10 @@
     }
 
     .category-header {
-      padding: 20px 10px;
-      font-size: 18px;
+      flex: 1;
+      min-width: 0;
+      padding: 12px 8px;
+      font-size: clamp(12px, 1.5vw, 18px);
       font-family: 'Bebas Neue', Impact, sans-serif;
       letter-spacing: 1px;
       text-align: center;
@@ -291,11 +319,13 @@
       color: #fff;
       text-transform: uppercase;
       word-wrap: break-word;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .edit-cell {
-      position: relative;
-      aspect-ratio: 1.2;
+      flex: 1;
+      min-width: 0;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -323,7 +353,7 @@
     }
 
     .cell-points {
-      font-size: 28px;
+      font-size: clamp(18px, 2.5vw, 28px);
       color: #FFD700;
       text-shadow: 0 2px 4px rgba(0,0,0,0.5);
     }
@@ -453,18 +483,19 @@
     .play-header {
       flex-direction: column;
       align-items: stretch;
+      padding: 10px 20px;
     }
 
     .play-header-top {
       display: flex;
       align-items: center;
-      gap: 20px;
+      gap: 15px;
       width: 100%;
     }
 
     .play-title {
       flex: 1;
-      font-size: 32px;
+      font-size: clamp(20px, 3vw, 32px);
       letter-spacing: 4px;
       color: #FFD700;
       text-align: center;
@@ -475,17 +506,17 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 15px;
+      gap: 10px;
       flex-wrap: wrap;
-      margin-top: 20px;
+      margin-top: 10px;
     }
 
     .team-card {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 5px;
-      padding: 15px 25px;
+      gap: 3px;
+      padding: 8px 15px;
       background: rgba(26, 58, 138, 0.5);
       border: 2px solid #3366cc;
       border-radius: 8px;
@@ -493,8 +524,8 @@
     }
 
     .team-name-input {
-      padding: 5px 10px;
-      font-size: 16px;
+      padding: 3px 8px;
+      font-size: 14px;
       font-family: 'Bebas Neue', Impact, sans-serif;
       letter-spacing: 1px;
       text-align: center;
@@ -503,11 +534,11 @@
       border-bottom: 1px solid #666;
       color: #fff;
       outline: none;
-      width: 100px;
+      width: 80px;
     }
 
     .team-score {
-      font-size: 28px;
+      font-size: 22px;
       font-weight: bold;
     }
 
@@ -532,8 +563,8 @@
     }
 
     .add-team-button {
-      padding: 15px 20px;
-      font-size: 16px;
+      padding: 8px 15px;
+      font-size: 14px;
       font-family: 'Bebas Neue', Impact, sans-serif;
       letter-spacing: 1px;
       background: transparent;
@@ -544,7 +575,8 @@
     }
 
     .play-cell {
-      aspect-ratio: 1.2;
+      flex: 1;
+      min-width: 0;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -567,7 +599,7 @@
     }
 
     .play-cell-points {
-      font-size: 36px;
+      font-size: clamp(20px, 3vw, 36px);
       color: #FFD700;
       text-shadow: 0 2px 8px rgba(0,0,0,0.5);
     }
