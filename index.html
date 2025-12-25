@@ -244,6 +244,32 @@
       color: #fff;
       cursor: pointer;
       white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .save-button:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    .save-spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .save-success {
+      color: #90EE90;
+      font-weight: bold;
     }
 
     .preview-button {
@@ -632,8 +658,9 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 90%;
+      width: 100%;
       max-width: 80vw;
+      height: 90vh;
       padding: 40px;
       background: linear-gradient(180deg, #1a3a8a 0%, #0a1a4a 100%);
       border: 4px solid #3366cc;
@@ -651,7 +678,7 @@
     }
 
     .question-image {
-      max-width: auto;
+      max-width: 100%;
       max-height: 60vh;
       object-fit: contain;
       border-radius: 8px;
@@ -960,7 +987,12 @@
       <button class="back-button" onclick="goHome()">← Back</button>
       <input type="text" id="game-title-input" class="title-input" placeholder="Game Title">
       <div class="header-actions">
-        <button class="save-button" onclick="saveCurrentGame()">💾 Save Game</button>
+        <button class="save-button" onclick="saveCurrentGame()">
+          <span id="save-icon-default">💾</span>
+          <span id="save-icon-loading" class="hidden save-spinner"></span>
+          <span id="save-icon-success" class="hidden">✓</span>
+          <span id="save-text">Save Game</span>
+        </button>
         <button class="preview-button" onclick="playCurrentGame()">▶ Play</button>
       </div>
     </div>
@@ -1179,18 +1211,59 @@
       }
     }
 
-    function saveCurrentGame() {
-      currentGame.title = document.getElementById('game-title-input').value || 'Untitled Game';
+    async function saveCurrentGame() {
+      const saveButton = document.querySelector('.save-button');
+      const iconDefault = document.getElementById('save-icon-default');
+      const iconLoading = document.getElementById('save-icon-loading');
+      const iconSuccess = document.getElementById('save-icon-success');
+      const saveText = document.getElementById('save-text');
       
-      const existingIndex = games.findIndex(g => g.id === currentGame.id);
-      if (existingIndex >= 0) {
-        games[existingIndex] = currentGame;
-      } else {
-        games.push(currentGame);
+      // Show loading state
+      saveButton.disabled = true;
+      iconDefault.classList.add('hidden');
+      iconLoading.classList.remove('hidden');
+      iconSuccess.classList.add('hidden');
+      saveText.textContent = 'Saving...';
+      
+      try {
+        currentGame.title = document.getElementById('game-title-input').value || 'Untitled Game';
+        
+        const existingIndex = games.findIndex(g => g.id === currentGame.id);
+        if (existingIndex >= 0) {
+          games[existingIndex] = currentGame;
+        } else {
+          games.push(currentGame);
+        }
+        
+        // Simulate a small delay to ensure save completes
+        await new Promise(resolve => setTimeout(resolve, 300));
+        saveGames();
+        
+        // Show success state
+        iconLoading.classList.add('hidden');
+        iconSuccess.classList.remove('hidden');
+        saveText.textContent = 'Saved!';
+        
+        // Reset to default after 2 seconds
+        setTimeout(() => {
+          iconSuccess.classList.add('hidden');
+          iconDefault.classList.remove('hidden');
+          saveText.textContent = 'Save Game';
+          saveButton.disabled = false;
+        }, 2000);
+        
+      } catch (error) {
+        console.error('Save failed:', error);
+        // Show error state
+        iconLoading.classList.add('hidden');
+        iconDefault.classList.remove('hidden');
+        saveText.textContent = 'Save Failed';
+        saveButton.disabled = false;
+        
+        setTimeout(() => {
+          saveText.textContent = 'Save Game';
+        }, 2000);
       }
-      
-      saveGames();
-      showToast('Game saved!');
     }
 
     function goHome() {
