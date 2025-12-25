@@ -665,7 +665,7 @@
       color: #fff;
       line-height: 1.4;
       margin-bottom: 30px;
-      text-transform: uppercase;
+      text-transform: sentence-case;
     }
 
     .show-answer-button {
@@ -1038,6 +1038,27 @@
 
     // Initialize
     document.addEventListener('DOMContentLoaded', loadGames);
+
+    // Keyboard controls for question modal
+    document.addEventListener('keydown', function(e) {
+    // Only handle keys when modal is open
+    const modal = document.getElementById('question-modal');
+    if (modal.classList.contains('hidden')) return;
+    
+    // Spacebar to reveal answer
+    if (e.code === 'Space') {
+        e.preventDefault();
+        const showAnswerBtn = document.getElementById('show-answer-btn');
+        if (!showAnswerBtn.classList.contains('hidden')) {
+        showAnswer();
+        }
+    }
+    
+    // Escape to close modal
+    if (e.code === 'Escape') {
+        closeQuestionModal();
+    }
+    });
 
     function createEmptyGame(title = 'Untitled Game') {
       return {
