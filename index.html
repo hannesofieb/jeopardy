@@ -521,6 +521,7 @@
       border: 2px solid #3366cc;
       border-radius: 8px;
       position: relative;
+      min-width: 100px;
     }
 
     .team-name-input {
@@ -534,7 +535,18 @@
       border-bottom: 1px solid #666;
       color: #fff;
       outline: none;
-      width: 80px;
+      width: auto;
+      min-width: 80px;
+      max-width: 200px;
+    }
+
+    .team-name-display {
+      font-size: 16px;
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      letter-spacing: 1px;
+      text-align: center;
+      color: #fff;
+      padding: 3px 8px;
     }
 
     .team-score {
@@ -640,7 +652,7 @@
 
     .question-image {
       max-width: auto;
-      max-height: 50vh;
+      max-height: 60vh;
       object-fit: contain;
       border-radius: 8px;
       margin-bottom: 20px;
@@ -729,6 +741,150 @@
       display: none !important;
     }
 
+    /* Team Setup View Styles */
+    #team-setup-view {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .setup-wrapper {
+      width: 100%;
+      max-width: 500px;
+      padding: 20px;
+    }
+
+    .setup-header {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .setup-title {
+      flex: 1;
+      font-size: 36px;
+      letter-spacing: 4px;
+      color: #FFD700;
+      text-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+      margin: 0;
+    }
+
+    .setup-content {
+      background: rgba(26, 58, 138, 0.3);
+      border: 2px solid #3366cc;
+      border-radius: 12px;
+      padding: 30px;
+    }
+
+    .setup-subtitle {
+      font-size: 16px;
+      color: #8888aa;
+      font-family: system-ui, sans-serif;
+      margin: 0 0 25px 0;
+      text-align: center;
+    }
+
+    .setup-teams-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .setup-team-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 15px;
+      background: rgba(10, 26, 74, 0.5);
+      border: 2px solid #3366cc;
+      border-radius: 8px;
+    }
+
+    .setup-team-number {
+      font-size: 18px;
+      color: #FFD700;
+      min-width: 30px;
+    }
+
+    .setup-team-input {
+      flex: 1;
+      padding: 10px 15px;
+      font-size: 18px;
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      letter-spacing: 1px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid #4466aa;
+      border-radius: 4px;
+      color: #fff;
+      outline: none;
+    }
+
+    .setup-team-input:focus {
+      border-color: #FFD700;
+    }
+
+    .remove-setup-team-button {
+      padding: 8px 12px;
+      font-size: 16px;
+      background: rgba(139, 0, 0, 0.5);
+      border: 2px solid #8B0000;
+      border-radius: 4px;
+      color: #FF6B6B;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .remove-setup-team-button:hover {
+      background: rgba(139, 0, 0, 0.8);
+    }
+
+    .add-team-setup-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 14px 20px;
+      font-size: 18px;
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      letter-spacing: 2px;
+      background: transparent;
+      border: 2px dashed #666;
+      border-radius: 8px;
+      color: #888;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-bottom: 20px;
+    }
+
+    .add-team-setup-button:hover {
+      border-color: #FFD700;
+      color: #FFD700;
+    }
+
+    .start-game-button {
+      width: 100%;
+      padding: 18px 40px;
+      font-size: 24px;
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      letter-spacing: 3px;
+      background: linear-gradient(135deg, #228B22 0%, #006400 100%);
+      border: 3px solid #32CD32;
+      border-radius: 8px;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(50, 205, 50, 0.3);
+      transition: all 0.2s ease;
+    }
+
+    .start-game-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 30px rgba(50, 205, 50, 0.5);
+    }
+
     /* Toast notification */
     .toast {
       position: fixed;
@@ -771,6 +927,29 @@
       <div id="games-section" class="games-section hidden">
         <h2 class="section-title">Your Games</h2>
         <div id="games-list" class="games-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Team Setup View -->
+  <div id="team-setup-view" class="hidden">
+    <div class="setup-wrapper">
+      <div class="setup-header">
+        <button class="back-button" onclick="goHome()">← Back</button>
+        <h1 class="setup-title">Team Setup</h1>
+      </div>
+      <div class="setup-content">
+        <p class="setup-subtitle">Configure your teams before starting the game</p>
+        
+        <div id="setup-teams-list" class="setup-teams-list"></div>
+        
+        <button class="add-team-setup-button" onclick="addTeamInSetup()">
+          <span class="create-icon">+</span> Add Team
+        </button>
+        
+        <button class="start-game-button" onclick="startGame()">
+          ▶ Start Game
+        </button>
       </div>
     </div>
   </div>
@@ -949,17 +1128,12 @@
           { name: 'Team 1', score: 0 },
           { name: 'Team 2', score: 0 }
         ];
-      }
-
-      showView(mode);
-      
-      if (mode === 'edit') {
+        showView('team-setup');
+        renderSetupTeams();
+      } else {
+        showView('edit');
         renderEditBoard();
         document.getElementById('game-title-input').value = currentGame.title;
-      } else {
-        renderPlayBoard();
-        renderTeams();
-        document.getElementById('play-title').textContent = currentGame.title;
       }
     }
 
@@ -972,10 +1146,8 @@
         { name: 'Team 2', score: 0 }
       ];
       
-      showView('play');
-      renderPlayBoard();
-      renderTeams();
-      document.getElementById('play-title').textContent = currentGame.title;
+      showView('team-setup');
+      renderSetupTeams();
     }
 
     function deleteGame(gameId) {
@@ -1007,6 +1179,7 @@
 
     function showView(view) {
       document.getElementById('home-view').classList.toggle('hidden', view !== 'home');
+      document.getElementById('team-setup-view').classList.toggle('hidden', view !== 'team-setup');
       document.getElementById('edit-view').classList.toggle('hidden', view !== 'edit');
       document.getElementById('play-view').classList.toggle('hidden', view !== 'play');
     }
@@ -1138,16 +1311,12 @@
       
       let html = teams.map((team, index) => `
         <div class="team-card">
-          <input type="text" class="team-name-input" value="${escapeHtml(team.name)}" 
-                 onchange="updateTeamName(${index}, this.value)">
+          <div class="team-name-display">${escapeHtml(team.name)}</div>
           <div class="team-score ${team.score >= 0 ? 'positive' : 'negative'}">
             $${team.score.toLocaleString()}
           </div>
-          ${teams.length > 1 ? `<button class="remove-team-button" onclick="removeTeam(${index})">✕</button>` : ''}
         </div>
       `).join('');
-      
-      html += '<button class="add-team-button" onclick="addTeam()">+ Add Team</button>';
       
       container.innerHTML = html;
     }
@@ -1156,9 +1325,66 @@
       teams[index].name = name;
     }
 
+    function autoResizeInput(input) {
+      // Create a temporary span to measure text width
+      const span = document.createElement('span');
+      span.style.visibility = 'hidden';
+      span.style.position = 'absolute';
+      span.style.whiteSpace = 'pre';
+      span.style.font = window.getComputedStyle(input).font;
+      span.style.letterSpacing = window.getComputedStyle(input).letterSpacing;
+      span.textContent = input.value || input.placeholder || '';
+      document.body.appendChild(span);
+      
+      const textWidth = span.offsetWidth + 20; // Add padding
+      document.body.removeChild(span);
+      
+      const minWidth = 80;
+      const maxWidth = 200;
+      input.style.width = Math.min(Math.max(textWidth, minWidth), maxWidth) + 'px';
+    }
+
     function addTeam() {
       teams.push({ name: `Team ${teams.length + 1}`, score: 0 });
       renderTeams();
+    }
+
+    // Team Setup Functions
+    function renderSetupTeams() {
+      const list = document.getElementById('setup-teams-list');
+      
+      list.innerHTML = teams.map((team, index) => `
+        <div class="setup-team-row">
+          <span class="setup-team-number">${index + 1}.</span>
+          <input type="text" class="setup-team-input" value="${escapeHtml(team.name)}" 
+                 onchange="updateSetupTeamName(${index}, this.value)"
+                 placeholder="Enter team name">
+          ${teams.length > 1 ? `<button class="remove-setup-team-button" onclick="removeTeamInSetup(${index})">✕</button>` : ''}
+        </div>
+      `).join('');
+    }
+
+    function updateSetupTeamName(index, name) {
+      teams[index].name = name;
+    }
+
+    function addTeamInSetup() {
+      teams.push({ name: `Team ${teams.length + 1}`, score: 0 });
+      renderSetupTeams();
+    }
+
+    function removeTeamInSetup(index) {
+      if (teams.length > 1) {
+        teams.splice(index, 1);
+        renderSetupTeams();
+      }
+    }
+
+    function startGame() {
+      showView('play');
+      renderPlayBoard();
+      renderTeams();
+      document.getElementById('play-title').textContent = currentGame.title;
     }
 
     function removeTeam(index) {
