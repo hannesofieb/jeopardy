@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jeopardy! Game Creator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 50%, #0a0a1a 100%);
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      color: #fff;
+    }
+
+    /* Home View Styles */
+    .home-wrapper {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 60px 20px;
+    }
+
+    .logo-section {
+      text-align: center;
+      margin-bottom: 50px;
+      position: relative;
+    }
+
+    .logo-accent {
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      height: 8px;
+      background: linear-gradient(90deg, transparent, #FFD700, transparent);
+      border-radius: 4px;
+    }
+
+    .main-title {
+      font-size: 72px;
+      font-weight: 400;
+      letter-spacing: 8px;
+      color: #FFD700;
+      text-shadow: 0 0 30px rgba(255, 215, 0, 0.5), 0 4px 0 #B8860B;
+      margin: 0;
+    }
+
+    .subtitle {
+      font-size: 24px;
+      color: #8888aa;
+      letter-spacing: 12px;
+      text-transform: uppercase;
+      margin: 10px 0 0 0;
+    }
+
+    .create-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+      padding: 24px 40px;
+      font-size: 24px;
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      letter-spacing: 3px;
+      background: linear-gradient(135deg, #1a3a8a 0%, #0a1a4a 100%);
+      border: 3px solid #3366cc;
+      border-radius: 8px;
+      color: #FFD700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(51, 102, 204, 0.3);
+    }
+
+    .create-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 30px rgba(51, 102, 204, 0.5);
+    }
+
+    .create-icon {
+      font-size: 32px;
+      font-weight: bold;
+    }
+
+    .games-section {
+      margin-top: 50px;
+    }
+
+    .section-title {
+      font-size: 28px;
+      color: #8888aa;
+      letter-spacing: 4px;
+      margin-bottom: 20px;
+    }
+
+    .games-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .game-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      background: rgba(26, 58, 138, 0.3);
+      border: 2px solid #3366cc;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .game-card:hover {
+      background: rgba(26, 58, 138, 0.5);
+    }
+
+    .game-card-content {
+      flex: 1;
+    }
+
+    .game-title {
+      font-size: 22px;
+      color: #fff;
+      margin: 0 0 4px 0;
+      letter-spacing: 2px;
+    }
+
+    .game-date {
+      font-size: 14px;
+      color: #6666aa;
+      margin: 0;
+      font-family: system-ui, sans-serif;
+    }
+
+    .game-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .play-btn {
+      padding: 10px 20px;
+      font-size: 16px;
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, #228B22 0%, #006400 100%);
+      border: 2px solid #32CD32;
+      border-radius: 4px;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .edit-btn {
+      padding: 10px 20px;
+      font-size: 16px;
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, #1a3a8a 0%, #0a1a4a 100%);
+      border: 2px solid #3366cc;
+      border-radius: 4px;
+      color: #FFD700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .delete-btn {
+      padding: 10px 14px;
+      font-size: 16px;
+      background: rgba(139, 0, 0, 0.5);
+      border: 2px solid #8B0000;
+      border-radius: 4px;
+      color: #FF6B6B;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    /* Edit View Styles */
+    .edit-header, .play-header {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 20px 30px;
+      background: rgba(0, 0, 0, 0.5);
+      border-bottom: 2px solid #3366cc;
+      flex-wrap: wrap;
+    }
+
+    .back-button {
+      padding: 10px 20px;
+      font-size: 18px;
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      letter-spacing: 2px;
+      background: transparent;
+      border: 2px solid #666;
+      border-radius: 4px;
+      color: #aaa;
+      cursor: pointer;
+    }
+
+    .title-input {
+      flex: 1;
+      min-width: 200px;
+      padding: 12px 20px;
+      font-size: 24px;
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      letter-spacing: 2px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid #3366cc;
+      border-radius: 4px;
+      color: #FFD700;
+      outline: none;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .save-button {
+      padding: 12px 24px;
+      font-size: 18px;
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, #228B22 0%, #006400 100%);
+      border: 2px solid #32CD32;
+      border-radius: 4px;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .preview-button {
+      padding: 12px 24px;
+      font-size: 18px;
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, #1a3a8a 0%, #0a1a4a 100%);
+      border: 2px solid #3366cc;
+      border-radius: 4px;
+      color: #FFD700;
+      cursor: pointer;
+    }
+
+    .board-container {
+      padding: 30px;
+      overflow: auto;
+    }
+
+    .board {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 800px;
+    }
+
+    .category-row, .question-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+    }
+
+    .category-input {
+      padding: 20px 10px;
+      font-size: 18px;
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      letter-spacing: 1px;
+      text-align: center;
+      background: linear-gradient(180deg, #1a3a8a 0%, #0a1a4a 100%);
+      border: 3px solid #3366cc;
+      border-radius: 4px;
+      color: #fff;
+      outline: none;
+      text-transform: uppercase;
+    }
+
+    .category-header {
+      padding: 20px 10px;
+      font-size: 18px;
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      letter-spacing: 1px;
+      text-align: center;
+      background: linear-gradient(180deg, #1a3a8a 0%, #0a1a4a 100%);
+      border: 3px solid #3366cc;
+      border-radius: 4px;
+      color: #fff;
+      text-transform: uppercase;
+      word-wrap: break-word;
+    }
+
+    .edit-cell {
+      position: relative;
+      aspect-ratio: 1.2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(180deg, #1a3a8a 0%, #0a1a4a 100%);
+      border: 3px solid #3366cc;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .edit-cell:hover {
+      border-color: #FFD700;
+    }
+
+    .edit-cell.filled {
+      background: linear-gradient(180deg, #2a4a9a 0%, #1a2a5a 100%);
+      border-color: #4488ee;
+    }
+
+    .cell-preview {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .cell-points {
+      font-size: 28px;
+      color: #FFD700;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .cell-check {
+      font-size: 16px;
+      color: #32CD32;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 1000;
+    }
+
+    .edit-popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 400px;
+      max-width: 90%;
+      padding: 20px;
+      background: linear-gradient(180deg, #1a2a5a 0%, #0a1a3a 100%);
+      border: 3px solid #FFD700;
+      border-radius: 8px;
+      z-index: 1001;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+    }
+
+    .edit-popup-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .edit-popup-points {
+      font-size: 24px;
+      color: #FFD700;
+    }
+
+    .close-edit-button {
+      padding: 5px 10px;
+      font-size: 18px;
+      background: transparent;
+      border: 1px solid #666;
+      border-radius: 4px;
+      color: #aaa;
+      cursor: pointer;
+    }
+
+    .question-textarea, .answer-textarea {
+      width: 100%;
+      padding: 12px;
+      font-size: 14px;
+      font-family: system-ui, sans-serif;
+      background: rgba(255,255,255,0.1);
+      border: 2px solid #3366cc;
+      border-radius: 4px;
+      color: #fff;
+      resize: vertical;
+      min-height: 80px;
+      margin-bottom: 10px;
+      outline: none;
+    }
+
+    .answer-textarea {
+      background: rgba(50, 205, 50, 0.1);
+      border-color: #32CD32;
+      color: #90EE90;
+      min-height: 60px;
+    }
+
+    .image-section {
+      margin-top: 10px;
+    }
+
+    .upload-label {
+      display: inline-block;
+      padding: 10px 20px;
+      font-size: 14px;
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      letter-spacing: 1px;
+      background: rgba(255,255,255,0.1);
+      border: 2px dashed #666;
+      border-radius: 4px;
+      color: #aaa;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .upload-label:hover {
+      border-color: #FFD700;
+      color: #FFD700;
+    }
+
+    .image-preview-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .image-preview {
+      max-width: 100%;
+      max-height: 150px;
+      object-fit: contain;
+      border-radius: 4px;
+    }
+
+    .remove-image-button {
+      padding: 8px 16px;
+      font-size: 12px;
+      font-family: system-ui, sans-serif;
+      background: rgba(139, 0, 0, 0.5);
+      border: 1px solid #8B0000;
+      border-radius: 4px;
+      color: #FF6B6B;
+      cursor: pointer;
+    }
+
+    /* Play View Styles */
+    .play-header {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .play-header-top {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      width: 100%;
+    }
+
+    .play-title {
+      flex: 1;
+      font-size: 32px;
+      letter-spacing: 4px;
+      color: #FFD700;
+      text-align: center;
+      margin: 0;
+    }
+
+    .teams-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .team-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      padding: 15px 25px;
+      background: rgba(26, 58, 138, 0.5);
+      border: 2px solid #3366cc;
+      border-radius: 8px;
+      position: relative;
+    }
+
+    .team-name-input {
+      padding: 5px 10px;
+      font-size: 16px;
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      letter-spacing: 1px;
+      text-align: center;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid #666;
+      color: #fff;
+      outline: none;
+      width: 100px;
+    }
+
+    .team-score {
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .team-score.positive {
+      color: #FFD700;
+    }
+
+    .team-score.negative {
+      color: #FF6B6B;
+    }
+
+    .remove-team-button {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      padding: 2px 6px;
+      font-size: 12px;
+      background: transparent;
+      border: none;
+      color: #666;
+      cursor: pointer;
+    }
+
+    .add-team-button {
+      padding: 15px 20px;
+      font-size: 16px;
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      letter-spacing: 1px;
+      background: transparent;
+      border: 2px dashed #666;
+      border-radius: 8px;
+      color: #888;
+      cursor: pointer;
+    }
+
+    .play-cell {
+      aspect-ratio: 1.2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(180deg, #1a3a8a 0%, #0a1a4a 100%);
+      border: 3px solid #3366cc;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .play-cell:hover:not(.answered):not(.empty) {
+      transform: scale(1.02);
+      border-color: #FFD700;
+    }
+
+    .play-cell.answered, .play-cell.empty {
+      background: rgba(10, 26, 74, 0.3);
+      border-color: rgba(51, 102, 204, 0.3);
+      cursor: default;
+    }
+
+    .play-cell-points {
+      font-size: 36px;
+      color: #FFD700;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.9);
+      z-index: 2000;
+    }
+
+    .question-modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      max-width: 700px;
+      padding: 40px;
+      background: linear-gradient(180deg, #1a3a8a 0%, #0a1a4a 100%);
+      border: 4px solid #3366cc;
+      border-radius: 12px;
+      z-index: 2001;
+      box-shadow: 0 0 60px rgba(51, 102, 204, 0.5);
+      text-align: center;
+    }
+
+    .modal-points {
+      font-size: 48px;
+      color: #FFD700;
+      text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+      margin-bottom: 30px;
+    }
+
+    .question-image {
+      max-width: 100%;
+      max-height: 250px;
+      object-fit: contain;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border: 2px solid #3366cc;
+    }
+
+    .question-text {
+      font-size: 28px;
+      font-family: system-ui, sans-serif;
+      color: #fff;
+      line-height: 1.4;
+      margin-bottom: 30px;
+      text-transform: uppercase;
+    }
+
+    .show-answer-button {
+      padding: 16px 40px;
+      font-size: 22px;
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      letter-spacing: 3px;
+      background: linear-gradient(135deg, #228B22 0%, #006400 100%);
+      border: 3px solid #32CD32;
+      border-radius: 8px;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(50, 205, 50, 0.3);
+    }
+
+    .scoring-section {
+      margin-top: 20px;
+    }
+
+    .scoring-prompt {
+      font-size: 18px;
+      color: #aaa;
+      margin-bottom: 15px;
+      font-family: system-ui, sans-serif;
+    }
+
+    .team-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-bottom: 15px;
+    }
+
+    .team-score-button {
+      padding: 14px 28px;
+      font-size: 18px;
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, #228B22 0%, #006400 100%);
+      border: 2px solid #32CD32;
+      border-radius: 6px;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .no-one-button {
+      padding: 12px 24px;
+      font-size: 16px;
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      letter-spacing: 2px;
+      background: rgba(139, 0, 0, 0.5);
+      border: 2px solid #8B0000;
+      border-radius: 6px;
+      color: #FF6B6B;
+      cursor: pointer;
+    }
+
+    .close-modal-button {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      padding: 8px 14px;
+      font-size: 20px;
+      background: transparent;
+      border: 2px solid #666;
+      border-radius: 4px;
+      color: #aaa;
+      cursor: pointer;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 15px 30px;
+      background: linear-gradient(135deg, #228B22 0%, #006400 100%);
+      border: 2px solid #32CD32;
+      border-radius: 8px;
+      color: #fff;
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      letter-spacing: 2px;
+      font-size: 18px;
+      z-index: 3000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <!-- Home View -->
+  <div id="home-view">
+    <div class="home-wrapper">
+      <div class="logo-section">
+        <div class="logo-accent"></div>
+        <h1 class="main-title">JEOPARDY!</h1>
+        <p class="subtitle">Game Creator</p>
+      </div>
+      
+      <button class="create-button" onclick="createNewGame()">
+        <span class="create-icon">+</span>
+        Create New Game
+      </button>
+
+      <div id="games-section" class="games-section hidden">
+        <h2 class="section-title">Your Games</h2>
+        <div id="games-list" class="games-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit View -->
+  <div id="edit-view" class="hidden">
+    <div class="edit-header">
+      <button class="back-button" onclick="goHome()">← Back</button>
+      <input type="text" id="game-title-input" class="title-input" placeholder="Game Title">
+      <div class="header-actions">
+        <button class="save-button" onclick="saveCurrentGame()">💾 Save Game</button>
+        <button class="preview-button" onclick="playCurrentGame()">▶ Play</button>
+      </div>
+    </div>
+    <div class="board-container">
+      <div id="edit-board" class="board"></div>
+    </div>
+  </div>
+
+  <!-- Play View -->
+  <div id="play-view" class="hidden">
+    <div class="play-header">
+      <div class="play-header-top">
+        <button class="back-button" onclick="goHome()">← Exit Game</button>
+        <h1 id="play-title" class="play-title"></h1>
+        <div style="width: 100px;"></div>
+      </div>
+      <div id="teams-container" class="teams-container"></div>
+    </div>
+    <div class="board-container">
+      <div id="play-board" class="board"></div>
+    </div>
+  </div>
+
+  <!-- Edit Popup -->
+  <div id="edit-overlay" class="overlay hidden" onclick="closeEditPopup()"></div>
+  <div id="edit-popup" class="edit-popup hidden">
+    <div class="edit-popup-header">
+      <span id="edit-popup-points" class="edit-popup-points"></span>
+      <button class="close-edit-button" onclick="closeEditPopup()">✕</button>
+    </div>
+    <textarea id="question-input" class="question-textarea" placeholder="Enter the question/clue..."></textarea>
+    <textarea id="answer-input" class="answer-textarea" placeholder="Enter the answer..."></textarea>
+    <div class="image-section">
+      <div id="image-preview-container" class="image-preview-container hidden">
+        <img id="image-preview" class="image-preview" src="" alt="Question image">
+        <button class="remove-image-button" onclick="removeImage()">Remove Image</button>
+      </div>
+      <label id="upload-label" class="upload-label">
+        <input type="file" id="image-input" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+        📷 Add Image
+      </label>
+    </div>
+  </div>
+
+  <!-- Question Modal -->
+  <div id="modal-overlay" class="modal-overlay hidden" onclick="closeQuestionModal()"></div>
+  <div id="question-modal" class="question-modal hidden">
+    <div id="modal-points" class="modal-points"></div>
+    <img id="modal-image" class="question-image hidden" src="" alt="Question image">
+    <div id="modal-question-text" class="question-text"></div>
+    <button id="show-answer-btn" class="show-answer-button" onclick="showAnswer()">Show Answer</button>
+    <div id="scoring-section" class="scoring-section hidden">
+      <p class="scoring-prompt">Who got it right?</p>
+      <div id="team-buttons" class="team-buttons"></div>
+      <button class="no-one-button" onclick="markAnswered(false, null)">No one got it</button>
+    </div>
+    <button class="close-modal-button" onclick="closeQuestionModal()">✕</button>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast">Game saved!</div>
+
+  <script>
+    const POINT_VALUES = [100, 200, 300, 400, 500];
+    const DEFAULT_CATEGORIES = 5;
+
+    let games = [];
+    let currentGame = null;
+    let editingCell = null;
+    let selectedCell = null;
+    let teams = [
+      { name: 'Team 1', score: 0 },
+      { name: 'Team 2', score: 0 }
+    ];
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', loadGames);
+
+    function createEmptyGame(title = 'Untitled Game') {
+      return {
+        id: Date.now().toString(),
+        title,
+        createdAt: new Date().toISOString(),
+        categories: Array(DEFAULT_CATEGORIES).fill(null).map((_, i) => ({
+          name: `Category ${i + 1}`,
+          questions: POINT_VALUES.map(points => ({
+            points,
+            question: '',
+            answer: '',
+            image: null,
+            answered: false
+          }))
+        }))
+      };
+    }
+
+    function loadGames() {
+      const saved = localStorage.getItem('jeopardy-games');
+      if (saved) {
+        games = JSON.parse(saved);
+        renderGamesList();
+      }
+    }
+
+    function saveGames() {
+      localStorage.setItem('jeopardy-games', JSON.stringify(games));
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    function renderGamesList() {
+      const section = document.getElementById('games-section');
+      const list = document.getElementById('games-list');
+      
+      if (games.length === 0) {
+        section.classList.add('hidden');
+        return;
+      }
+
+      section.classList.remove('hidden');
+      list.innerHTML = games.map(game => `
+        <div class="game-card">
+          <div class="game-card-content">
+            <h3 class="game-title">${escapeHtml(game.title)}</h3>
+            <p class="game-date">${new Date(game.createdAt).toLocaleDateString()}</p>
+          </div>
+          <div class="game-actions">
+            <button class="play-btn" onclick="loadGame('${game.id}', 'play')">▶ Play</button>
+            <button class="edit-btn" onclick="loadGame('${game.id}', 'edit')">✎ Edit</button>
+            <button class="delete-btn" onclick="deleteGame('${game.id}')">✕</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function createNewGame() {
+      currentGame = createEmptyGame();
+      showView('edit');
+      renderEditBoard();
+      document.getElementById('game-title-input').value = currentGame.title;
+    }
+
+    function loadGame(gameId, mode) {
+      const game = games.find(g => g.id === gameId);
+      if (!game) return;
+
+      currentGame = JSON.parse(JSON.stringify(game));
+      
+      if (mode === 'play') {
+        currentGame.categories.forEach(cat => {
+          cat.questions.forEach(q => q.answered = false);
+        });
+        teams = [
+          { name: 'Team 1', score: 0 },
+          { name: 'Team 2', score: 0 }
+        ];
+      }
+
+      showView(mode);
+      
+      if (mode === 'edit') {
+        renderEditBoard();
+        document.getElementById('game-title-input').value = currentGame.title;
+      } else {
+        renderPlayBoard();
+        renderTeams();
+        document.getElementById('play-title').textContent = currentGame.title;
+      }
+    }
+
+    function playCurrentGame() {
+      currentGame.categories.forEach(cat => {
+        cat.questions.forEach(q => q.answered = false);
+      });
+      teams = [
+        { name: 'Team 1', score: 0 },
+        { name: 'Team 2', score: 0 }
+      ];
+      
+      showView('play');
+      renderPlayBoard();
+      renderTeams();
+      document.getElementById('play-title').textContent = currentGame.title;
+    }
+
+    function deleteGame(gameId) {
+      if (confirm('Are you sure you want to delete this game?')) {
+        games = games.filter(g => g.id !== gameId);
+        saveGames();
+        renderGamesList();
+      }
+    }
+
+    function saveCurrentGame() {
+      currentGame.title = document.getElementById('game-title-input').value || 'Untitled Game';
+      
+      const existingIndex = games.findIndex(g => g.id === currentGame.id);
+      if (existingIndex >= 0) {
+        games[existingIndex] = currentGame;
+      } else {
+        games.push(currentGame);
+      }
+      
+      saveGames();
+      showToast('Game saved!');
+    }
+
+    function goHome() {
+      showView('home');
+      renderGamesList();
+    }
+
+    function showView(view) {
+      document.getElementById('home-view').classList.toggle('hidden', view !== 'home');
+      document.getElementById('edit-view').classList.toggle('hidden', view !== 'edit');
+      document.getElementById('play-view').classList.toggle('hidden', view !== 'play');
+    }
+
+    // Edit Board
+    function renderEditBoard() {
+      const board = document.getElementById('edit-board');
+      
+      let html = '<div class="category-row">';
+      currentGame.categories.forEach((cat, catIndex) => {
+        html += `<input type="text" class="category-input" value="${escapeHtml(cat.name)}" 
+                  onchange="updateCategory(${catIndex}, this.value)" placeholder="Category ${catIndex + 1}">`;
+      });
+      html += '</div>';
+
+      POINT_VALUES.forEach((points, qIndex) => {
+        html += '<div class="question-row">';
+        currentGame.categories.forEach((cat, catIndex) => {
+          const question = cat.questions[qIndex];
+          const hasContent = question.question || question.image;
+          html += `
+            <div class="edit-cell ${hasContent ? 'filled' : ''}" onclick="openEditPopup(${catIndex}, ${qIndex})">
+              <div class="cell-preview">
+                <span class="cell-points">$${points}</span>
+                ${hasContent ? '<span class="cell-check">✓</span>' : ''}
+              </div>
+            </div>
+          `;
+        });
+        html += '</div>';
+      });
+
+      board.innerHTML = html;
+    }
+
+    function updateCategory(catIndex, name) {
+      currentGame.categories[catIndex].name = name;
+    }
+
+    function openEditPopup(catIndex, qIndex) {
+      editingCell = { catIndex, qIndex };
+      const question = currentGame.categories[catIndex].questions[qIndex];
+      
+      document.getElementById('edit-popup-points').textContent = `$${question.points}`;
+      document.getElementById('question-input').value = question.question;
+      document.getElementById('answer-input').value = question.answer;
+      
+      if (question.image) {
+        document.getElementById('image-preview').src = question.image;
+        document.getElementById('image-preview-container').classList.remove('hidden');
+        document.getElementById('upload-label').classList.add('hidden');
+      } else {
+        document.getElementById('image-preview-container').classList.add('hidden');
+        document.getElementById('upload-label').classList.remove('hidden');
+      }
+
+      document.getElementById('edit-overlay').classList.remove('hidden');
+      document.getElementById('edit-popup').classList.remove('hidden');
+    }
+
+    function closeEditPopup() {
+      if (editingCell) {
+        const question = currentGame.categories[editingCell.catIndex].questions[editingCell.qIndex];
+        question.question = document.getElementById('question-input').value;
+        question.answer = document.getElementById('answer-input').value;
+        renderEditBoard();
+      }
+      
+      editingCell = null;
+      document.getElementById('edit-overlay').classList.add('hidden');
+      document.getElementById('edit-popup').classList.add('hidden');
+    }
+
+    function handleImageUpload(event) {
+      const file = event.target.files[0];
+      if (file && editingCell) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          currentGame.categories[editingCell.catIndex].questions[editingCell.qIndex].image = reader.result;
+          document.getElementById('image-preview').src = reader.result;
+          document.getElementById('image-preview-container').classList.remove('hidden');
+          document.getElementById('upload-label').classList.add('hidden');
+        };
+        reader.readAsDataURL(file);
+      }
+      event.target.value = '';
+    }
+
+    function removeImage() {
+      if (editingCell) {
+        currentGame.categories[editingCell.catIndex].questions[editingCell.qIndex].image = null;
+        document.getElementById('image-preview-container').classList.add('hidden');
+        document.getElementById('upload-label').classList.remove('hidden');
+      }
+    }
+
+    // Play Board
+    function renderPlayBoard() {
+      const board = document.getElementById('play-board');
+      
+      let html = '<div class="category-row">';
+      currentGame.categories.forEach(cat => {
+        html += `<div class="category-header">${escapeHtml(cat.name)}</div>`;
+      });
+      html += '</div>';
+
+      POINT_VALUES.forEach((points, qIndex) => {
+        html += '<div class="question-row">';
+        currentGame.categories.forEach((cat, catIndex) => {
+          const question = cat.questions[qIndex];
+          const isAnswered = question.answered;
+          const hasContent = question.question;
+          
+          html += `
+            <div class="play-cell ${isAnswered ? 'answered' : ''} ${!hasContent ? 'empty' : ''}" 
+                 onclick="selectQuestion(${catIndex}, ${qIndex})">
+              ${!isAnswered && hasContent ? `<span class="play-cell-points">$${points}</span>` : ''}
+            </div>
+          `;
+        });
+        html += '</div>';
+      });
+
+      board.innerHTML = html;
+    }
+
+    function renderTeams() {
+      const container = document.getElementById('teams-container');
+      
+      let html = teams.map((team, index) => `
+        <div class="team-card">
+          <input type="text" class="team-name-input" value="${escapeHtml(team.name)}" 
+                 onchange="updateTeamName(${index}, this.value)">
+          <div class="team-score ${team.score >= 0 ? 'positive' : 'negative'}">
+            $${team.score.toLocaleString()}
+          </div>
+          ${teams.length > 1 ? `<button class="remove-team-button" onclick="removeTeam(${index})">✕</button>` : ''}
+        </div>
+      `).join('');
+      
+      html += '<button class="add-team-button" onclick="addTeam()">+ Add Team</button>';
+      
+      container.innerHTML = html;
+    }
+
+    function updateTeamName(index, name) {
+      teams[index].name = name;
+    }
+
+    function addTeam() {
+      teams.push({ name: `Team ${teams.length + 1}`, score: 0 });
+      renderTeams();
+    }
+
+    function removeTeam(index) {
+      if (teams.length > 1) {
+        teams.splice(index, 1);
+        renderTeams();
+      }
+    }
+
+    function selectQuestion(catIndex, qIndex) {
+      const question = currentGame.categories[catIndex].questions[qIndex];
+      if (question.answered || !question.question) return;
+
+      selectedCell = { catIndex, qIndex };
+      
+      document.getElementById('modal-points').textContent = `$${question.points}`;
+      document.getElementById('modal-question-text').textContent = question.question;
+      
+      if (question.image) {
+        document.getElementById('modal-image').src = question.image;
+        document.getElementById('modal-image').classList.remove('hidden');
+      } else {
+        document.getElementById('modal-image').classList.add('hidden');
+      }
+
+      document.getElementById('show-answer-btn').classList.remove('hidden');
+      document.getElementById('scoring-section').classList.add('hidden');
+
+      document.getElementById('modal-overlay').classList.remove('hidden');
+      document.getElementById('question-modal').classList.remove('hidden');
+    }
+
+    function showAnswer() {
+      const question = currentGame.categories[selectedCell.catIndex].questions[selectedCell.qIndex];
+      document.getElementById('modal-question-text').textContent = question.answer;
+      document.getElementById('modal-image').classList.add('hidden');
+      document.getElementById('show-answer-btn').classList.add('hidden');
+      
+      // Render team buttons
+      const teamButtons = document.getElementById('team-buttons');
+      teamButtons.innerHTML = teams.map((team, index) => `
+        <button class="team-score-button" onclick="markAnswered(true, ${index})">
+          ${escapeHtml(team.name)} +$${question.points}
+        </button>
+      `).join('');
+      
+      document.getElementById('scoring-section').classList.remove('hidden');
+    }
+
+    function markAnswered(correct, teamIndex) {
+      if (selectedCell && teamIndex !== null) {
+        const points = currentGame.categories[selectedCell.catIndex].questions[selectedCell.qIndex].points;
+        teams[teamIndex].score += correct ? points : -points;
+      }
+      
+      currentGame.categories[selectedCell.catIndex].questions[selectedCell.qIndex].answered = true;
+      
+      closeQuestionModal();
+      renderPlayBoard();
+      renderTeams();
+    }
+
+    function closeQuestionModal() {
+      selectedCell = null;
+      document.getElementById('modal-overlay').classList.add('hidden');
+      document.getElementById('question-modal').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>
