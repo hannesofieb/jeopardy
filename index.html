@@ -679,7 +679,7 @@
 
     .question-image {
       max-width: 100%;
-      max-height: 60vh;
+      max-height: 55vh;
       object-fit: contain;
       border-radius: 8px;
       margin-bottom: 20px;
@@ -1352,14 +1352,44 @@
       if (file && editingCell) {
         const reader = new FileReader();
         reader.onloadend = () => {
-          currentGame.categories[editingCell.catIndex].questions[editingCell.qIndex].image = reader.result;
-          document.getElementById('image-preview').src = reader.result;
-          document.getElementById('image-preview-container').classList.remove('hidden');
-          document.getElementById('upload-label').classList.add('hidden');
+          // Compress the image
+          compressImage(reader.result, 800, 0.7).then(compressedImage => {
+            currentGame.categories[editingCell.catIndex].questions[editingCell.qIndex].image = compressedImage;
+            document.getElementById('image-preview').src = compressedImage;
+            document.getElementById('image-preview-container').classList.remove('hidden');
+            document.getElementById('upload-label').classList.add('hidden');
+          });
         };
         reader.readAsDataURL(file);
       }
       event.target.value = '';
+    }
+
+    function compressImage(base64, maxWidth, quality) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          
+          // Scale down if wider than maxWidth
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width;
+            width = maxWidth;
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          // Convert to compressed JPEG
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.src = base64;
+      });
     }
 
     function removeImage() {
