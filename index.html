@@ -1009,7 +1009,7 @@
       <div class="play-header-top">
         <button class="back-button" onclick="goHome()">← Exit Game</button>
         <h1 id="play-title" class="play-title"></h1>
-        <div style="width: 100px;"></div>
+        <button class="fullscreen-button" onclick="toggleFullscreen()">⛶ Fullscreen</button>
       </div>
       <div id="teams-container" class="teams-container"></div>
     </div>
@@ -1601,6 +1601,24 @@
       document.getElementById('modal-overlay').classList.add('hidden');
       document.getElementById('question-modal').classList.add('hidden');
     }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          console.log('Fullscreen error:', err);
+        });
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    // Update button text when fullscreen changes
+    document.addEventListener('fullscreenchange', () => {
+      const btn = document.querySelector('.fullscreen-button');
+      if (btn) {
+        btn.textContent = document.fullscreenElement ? '✕ Exit Fullscreen' : '⛶ Fullscreen';
+      }
+    });
   </script>
 </body>
 </html>
