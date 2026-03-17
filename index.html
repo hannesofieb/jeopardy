@@ -130,8 +130,7 @@ body{height:100vh;overflow:hidden;background:linear-gradient(135deg,#0a0a1a 0%,#
 
 /* ── QUESTION MODAL ── */
 .modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.9);z-index:2000}
-.question-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:85vw;height:95vh;padding:5%;background:linear-gradient(180deg,#1a3a8a,#0a1a4a);border:4px solid #3366cc;border-radius:12px;z-index:2001;display:flex;flex-direction:column;gap:16px;overflow-y:auto;justify-content:space-between;}
-.question-inner{width:100%;height:100%;display:flex;flex-direction:column;gap:16px;padding:5%;border-radius:12px;box-sizing:border-box;overflow:auto;flex:1;justify-content:space-between;}
+.question-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:95vw;max-width:900px;max-height:95vh;padding:32px 32px 40px;background:linear-gradient(180deg,#1a3a8a,#0a1a4a);border:4px solid #3366cc;border-radius:12px;z-index:2001;display:flex;flex-direction:column;gap:16px;overflow-y:auto}
 .modal-pts{font-size:48px;color:#FFD700;text-shadow:0 0 20px rgba(255,215,0,.5);text-align:center;flex-shrink:0}
 .modal-content{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;min-height:80px}
 .modal-img{max-width:100%;max-height:40vh;object-fit:contain;border-radius:8px}
@@ -177,7 +176,7 @@ body{height:100vh;overflow:hidden;background:linear-gradient(135deg,#0a0a1a 0%,#
 .sc-award.on{background:linear-gradient(135deg,#145214,#0a320a);border-color:#90EE90;box-shadow:0 0 10px rgba(50,205,50,.5)}
 .sc-award.blocked{opacity:0.25;pointer-events:none;cursor:default}
 
-.submit-scores-btn{align-self:center;width:100%;max-width:500px;padding:16px 40px;font-size:22px;font-family:'Bebas Neue',Impact,sans-serif;letter-spacing:3px;background:linear-gradient(180deg,#1a3a8a,#0a1a4a);border:3px solid #3366cc;border-radius:8px;color:#FFD700;cursor:pointer;position:relative;z-index:10}
+.submit-scores-btn{align-self:center;width:100%;max-width:500px;padding:16px 40px;font-size:22px;font-family:'Bebas Neue',Impact,sans-serif;letter-spacing:3px;background:linear-gradient(180deg,#1a3a8a,#0a1a4a);border:3px solid #3366cc;border-radius:8px;color:#FFD700;cursor:pointer;position:absolute;bottom:0;left:50%;transform:translate(-50%,50%);z-index:10}
 
 /* ── TEAM SETUP ── */
 #team-setup-view{height:100vh;display:flex;align-items:center;justify-content:center;overflow-y:auto}
@@ -373,16 +372,14 @@ body{height:100vh;overflow:hidden;background:linear-gradient(135deg,#0a0a1a 0%,#
 <!-- QUESTION MODAL -->
 <div id="modal-overlay" class="modal-overlay hidden"></div>
 <div id="question-modal" class="question-modal hidden">
-  <div class="question-inner">
-    <button class="close-modal-btn" onclick="closeModal()">✕</button>
-    <div id="modal-pts" class="modal-pts"></div>
-    <div id="modal-content" class="modal-content"></div>
-    <div id="scoring-section" class="scoring-section hidden">
-      <div id="scoring-tiles" class="scoring-tiles"></div>
-    </div>
-  </div>
+  <button class="close-modal-btn" onclick="closeModal()">✕</button>
+  <div id="modal-pts" class="modal-pts"></div>
+  <div id="modal-content" class="modal-content"></div>
   <button id="show-ans-btn" class="show-ans-btn" onclick="showAnswer()">Show Answer</button>
-  <button id="submit-scores-btn" class="submit-scores-btn hidden" onclick="submitScores(awardedTo)">Submit Scores</button>
+  <div id="scoring-section" class="scoring-section hidden">
+    <div id="scoring-tiles" class="scoring-tiles"></div>
+    <button class="submit-scores-btn" onclick="submitScores(awardedTo)">Submit Scores</button>
+  </div>
 </div>
 
 <div id="toast" class="toast"></div>
@@ -683,8 +680,6 @@ function openQuestion(ci,qi){
   setModalContent(q,'question');
   document.getElementById('show-ans-btn').classList.remove('hidden');
   document.getElementById('scoring-section').classList.add('hidden');
-  // ensure submit button hidden when viewing the question
-  const sb=document.getElementById('submit-scores-btn'); if(sb) sb.classList.add('hidden');
   document.getElementById('modal-overlay').classList.remove('hidden');
   document.getElementById('question-modal').classList.remove('hidden');
 }
@@ -770,8 +765,6 @@ function showAnswer(){
   document.getElementById('show-ans-btn').classList.add('hidden');
   renderScoringTiles();
   document.getElementById('scoring-section').classList.remove('hidden');
-  // reveal submit button now that scoring is visible
-  const sb=document.getElementById('submit-scores-btn'); if(sb) sb.classList.remove('hidden');
 }
 
 function submitScores(awarded){
@@ -794,8 +787,6 @@ function closeModal(){
   selectedCell=null; awardedTo=null; manualAdj=[];
   document.getElementById('modal-overlay').classList.add('hidden');
   document.getElementById('question-modal').classList.add('hidden');
-  // hide submit button when closing
-  const sb=document.getElementById('submit-scores-btn'); if(sb) sb.classList.add('hidden');
 }
 
 // ══════════════════════════════════════════════
@@ -1017,6 +1008,8 @@ function startGame(){
   turnSeq=teams.map((_,i)=>(firstTurnIdx+i)%teams.length);
   turnStep=0; curTurn=turnSeq[0];
   dispScores=teams.map(()=>0);
+  // always wipe the scoreboard so tile count matches current teams
+  document.getElementById('scoreboard').innerHTML='';
   showView('play'); renderPlayBoard(); renderScoreboard();
   document.getElementById('play-title').textContent=currentGame.title;
 }
