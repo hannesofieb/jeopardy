@@ -130,7 +130,8 @@ body{height:100vh;overflow:hidden;background:linear-gradient(135deg,#0a0a1a 0%,#
 
 /* ── QUESTION MODAL ── */
 .modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.9);z-index:2000}
-.question-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:95vw;max-width:900px;max-height:95vh;padding:32px 32px 40px;background:linear-gradient(180deg,#1a3a8a,#0a1a4a);border:4px solid #3366cc;border-radius:12px;z-index:2001;display:flex;flex-direction:column;gap:16px;overflow-y:auto}
+.question-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:85vw;height:95vh;padding:5%;background:linear-gradient(180deg,#1a3a8a,#0a1a4a);border:4px solid #3366cc;border-radius:12px;z-index:2001;display:flex;flex-direction:column;gap:16px;overflow-y:auto;justify-content:space-between;}
+.question-inner{width:100%;height:100%;display:flex;flex-direction:column;gap:16px;padding:5%;border-radius:12px;box-sizing:border-box;overflow:auto;flex:1;justify-content:space-between;}
 .modal-pts{font-size:48px;color:#FFD700;text-shadow:0 0 20px rgba(255,215,0,.5);text-align:center;flex-shrink:0}
 .modal-content{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;min-height:80px}
 .modal-img{max-width:100%;max-height:40vh;object-fit:contain;border-radius:8px}
@@ -159,8 +160,24 @@ body{height:100vh;overflow:hidden;background:linear-gradient(135deg,#0a0a1a 0%,#
 .sc-award:hover{box-shadow:0 0 8px rgba(50,205,50,.4)}
 .sc-award.on{background:linear-gradient(135deg,#145214,#0a320a);border-color:#90EE90;box-shadow:0 0 10px rgba(50,205,50,.5)}
 .sc-award.blocked{opacity:0.25;pointer-events:none;cursor:default}
+.sc-tile{display:flex;flex-direction:column;align-items:center;gap:4px;width:110px;flex-shrink:0}
+.sc-photo{width:60px;height:60px;border-radius:50%;background:#1a1a3a;display:flex;align-items:center;justify-content:center;font-size:24px;color:#FFD700;overflow:hidden;flex-shrink:0}
+.sc-photo img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.sc-name{font-size:13px;letter-spacing:1px;color:#ccc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:104px;text-align:center}
+.sc-delta{font-size:16px;font-family:system-ui,sans-serif;font-weight:bold;text-align:center;min-height:22px}
+.sc-delta.pos{color:#32CD32}
+.sc-delta.neg{color:#FF6B6B}
+.sc-delta.zero{color:rgba(255,255,255,.3)}
+.sc-bar{height:4px;width:100%;border-radius:2px;margin-top:0}
+.sc-controls{display:flex;align-items:stretch;gap:4px;width:100%;margin-top:4px}
+.sc-adj{width:26px;flex-shrink:0;background:rgba(255,255,255,.08);border:1px solid #555;border-radius:4px;color:#ccc;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:system-ui,sans-serif;line-height:1;transition:border-color .15s,color .15s}
+.sc-adj:hover{border-color:#FFD700;color:#FFD700}
+.sc-award{flex:1;padding:7px 2px;font-size:13px;font-family:'Bebas Neue',Impact,sans-serif;letter-spacing:1px;background:linear-gradient(135deg,#228B22,#006400);border:2px solid #32CD32;border-radius:4px;color:#fff;cursor:pointer;text-align:center;transition:opacity .2s,box-shadow .15s}
+.sc-award:hover{box-shadow:0 0 8px rgba(50,205,50,.4)}
+.sc-award.on{background:linear-gradient(135deg,#145214,#0a320a);border-color:#90EE90;box-shadow:0 0 10px rgba(50,205,50,.5)}
+.sc-award.blocked{opacity:0.25;pointer-events:none;cursor:default}
 
-.submit-scores-btn{align-self:center;width:100%;max-width:500px;padding:16px 40px;font-size:22px;font-family:'Bebas Neue',Impact,sans-serif;letter-spacing:3px;background:linear-gradient(180deg,#1a3a8a,#0a1a4a);border:3px solid #3366cc;border-radius:8px;color:#FFD700;cursor:pointer;position:absolute;bottom:0;left:50%;transform:translate(-50%,50%);z-index:10}
+.submit-scores-btn{align-self:center;width:100%;max-width:500px;padding:16px 40px;font-size:22px;font-family:'Bebas Neue',Impact,sans-serif;letter-spacing:3px;background:linear-gradient(180deg,#1a3a8a,#0a1a4a);border:3px solid #3366cc;border-radius:8px;color:#FFD700;cursor:pointer;position:relative;z-index:10}
 
 /* ── TEAM SETUP ── */
 #team-setup-view{height:100vh;display:flex;align-items:center;justify-content:center;overflow-y:auto}
@@ -356,14 +373,16 @@ body{height:100vh;overflow:hidden;background:linear-gradient(135deg,#0a0a1a 0%,#
 <!-- QUESTION MODAL -->
 <div id="modal-overlay" class="modal-overlay hidden"></div>
 <div id="question-modal" class="question-modal hidden">
-  <button class="close-modal-btn" onclick="closeModal()">✕</button>
-  <div id="modal-pts" class="modal-pts"></div>
-  <div id="modal-content" class="modal-content"></div>
-  <button id="show-ans-btn" class="show-ans-btn" onclick="showAnswer()">Show Answer</button>
-  <div id="scoring-section" class="scoring-section hidden">
-    <div id="scoring-tiles" class="scoring-tiles"></div>
-    <button class="submit-scores-btn" onclick="submitScores(awardedTo)">Submit Scores</button>
+  <div class="question-inner">
+    <button class="close-modal-btn" onclick="closeModal()">✕</button>
+    <div id="modal-pts" class="modal-pts"></div>
+    <div id="modal-content" class="modal-content"></div>
+    <div id="scoring-section" class="scoring-section hidden">
+      <div id="scoring-tiles" class="scoring-tiles"></div>
+    </div>
   </div>
+  <button id="show-ans-btn" class="show-ans-btn" onclick="showAnswer()">Show Answer</button>
+  <button id="submit-scores-btn" class="submit-scores-btn hidden" onclick="submitScores(awardedTo)">Submit Scores</button>
 </div>
 
 <div id="toast" class="toast"></div>
@@ -664,6 +683,8 @@ function openQuestion(ci,qi){
   setModalContent(q,'question');
   document.getElementById('show-ans-btn').classList.remove('hidden');
   document.getElementById('scoring-section').classList.add('hidden');
+  // ensure submit button hidden when viewing the question
+  const sb=document.getElementById('submit-scores-btn'); if(sb) sb.classList.add('hidden');
   document.getElementById('modal-overlay').classList.remove('hidden');
   document.getElementById('question-modal').classList.remove('hidden');
 }
@@ -676,13 +697,46 @@ function setModalContent(q, phase){
     const wrap=document.createElement('div');
     wrap.className='yt-wrap';
     const iframe=document.createElement('iframe');
-    let src=`https://www.youtube.com/embed/${yt.id}?autoplay=1&start=${yt.start||0}`;
+    let src=`https://www.youtube.com/embed/${yt.id}?autoplay=1&start=${yt.start||0}&enablejsapi=1`;
     if(yt.end) src+=`&end=${yt.end}`;
     iframe.src=src;
     iframe.setAttribute('allow','autoplay; encrypted-media; fullscreen');
     iframe.setAttribute('allowfullscreen','');
     iframe.setAttribute('frameborder','0');
     iframe.style.cssText='width:100%;aspect-ratio:16/9;border-radius:8px;border:none';
+
+    // loop counter — play twice then pause
+    let playCount=0;
+    function onMsg(e){
+      if(!e.data) return;
+      try{
+        const d=typeof e.data==='string'?JSON.parse(e.data):e.data;
+        if(d.event==='onStateChange'){
+          // state 0 = ended
+          if(d.info===0){
+            playCount++;
+            if(playCount<2){
+              // seek back to start and play again
+              iframe.contentWindow.postMessage(JSON.stringify({
+                event:'command',func:'seekTo',args:[yt.start||0,true]
+              }),'*');
+              iframe.contentWindow.postMessage(JSON.stringify({
+                event:'command',func:'playVideo',args:[]
+              }),'*');
+            } else {
+              // second loop ended — pause
+              iframe.contentWindow.postMessage(JSON.stringify({
+                event:'command',func:'pauseVideo',args:[]
+              }),'*');
+              window.removeEventListener('message',onMsg);
+            }
+          }
+        }
+      }catch(_){}
+    }
+    window.addEventListener('message',onMsg);
+    iframe._msgHandler=onMsg; // store ref for cleanup on close
+
     wrap.appendChild(iframe);
     return wrap;
   }
@@ -716,6 +770,8 @@ function showAnswer(){
   document.getElementById('show-ans-btn').classList.add('hidden');
   renderScoringTiles();
   document.getElementById('scoring-section').classList.remove('hidden');
+  // reveal submit button now that scoring is visible
+  const sb=document.getElementById('submit-scores-btn'); if(sb) sb.classList.remove('hidden');
 }
 
 function submitScores(awarded){
@@ -730,11 +786,16 @@ function submitScores(awarded){
 
 function closeModal(){
   const el=document.getElementById('modal-content');
-  el.querySelectorAll('iframe').forEach(f=>{f.src='';});
+  el.querySelectorAll('iframe').forEach(f=>{
+    if(f._msgHandler) window.removeEventListener('message',f._msgHandler);
+    f.src='';
+  });
   el.innerHTML='';
   selectedCell=null; awardedTo=null; manualAdj=[];
   document.getElementById('modal-overlay').classList.add('hidden');
   document.getElementById('question-modal').classList.add('hidden');
+  // hide submit button when closing
+  const sb=document.getElementById('submit-scores-btn'); if(sb) sb.classList.add('hidden');
 }
 
 // ══════════════════════════════════════════════
