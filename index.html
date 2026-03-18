@@ -550,7 +550,7 @@ document.getElementById('vid-show-in-a').addEventListener('change',function(e){i
 function mpImgUpload(e){
   var f=e.target.files[0];if(!f)return;
   var r=new FileReader();
-  r.onloadend=function(){compress(r.result,480,.6).then(function(src){
+  r.onloadend=function(){compress(r.result,1200,.85).then(function(src){
     editDraft.mediaRef=src;
     editDraft.showMediaInQ=document.getElementById('show-in-q').checked;
     editDraft.showMediaInA=document.getElementById('show-in-a').checked;
@@ -852,7 +852,7 @@ function handlePaste(e,id){
   for(var i=0;i<items.length;i++){
     if(items[i].type.startsWith('image/')){
       e.preventDefault();var f=items[i].getAsFile(),r=new FileReader();
-      r.onload=function(ev){compress(ev.target.result,480,.6).then(function(img){document.execCommand('insertImage',false,img);syncRT(id);});};
+      r.onload=function(ev){compress(ev.target.result,1200,.85).then(function(img){document.execCommand('insertImage',false,img);syncRT(id);});};
       r.readAsDataURL(f);return;
     }
   }
@@ -1036,7 +1036,7 @@ function renderSetupTeams(){
 }
 function uploadTeamPhoto(e,idx){
   var f=e.target.files[0];if(!f)return;
-  var r=new FileReader();r.onloadend=function(){compress(r.result,200,.8).then(function(d){teams[idx].photo=d;renderSetupTeams();});};
+  var r=new FileReader();  r.onloadend=function(){compress(r.result,400,.85).then(function(d){teams[idx].photo=d;renderSetupTeams();});};
   r.readAsDataURL(f);e.target.value='';
 }
 function addTeamInSetup(){teams.push({name:'Team '+(teams.length+1),score:0,photo:null});renderSetupTeams();}
