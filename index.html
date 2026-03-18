@@ -159,8 +159,8 @@ body{height:100vh;overflow:hidden;background:linear-gradient(135deg,#0a0a1a 0%,#
 .modal-pts{font-size:48px;color:#FFD700;text-shadow:0 0 20px rgba(255,215,0,.5);text-align:center;flex-shrink:0}
 .modal-content{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:16px;flex:1;min-height:0;overflow:hidden}
 .modal-img{display:block;border-radius:8px;object-fit:contain;flex-shrink:1;min-height:0}
-.modal-text{font-size:26px;font-family:system-ui,sans-serif;color:#fff;line-height:1.4;text-align:center;flex-shrink:0;width:100%}
-.modal-text ul,.modal-text ol{padding-left:32px;margin:6px 0;text-align:left}
+.modal-text{font-size:26px;font-family:system-ui,sans-serif;color:#fff;line-height:1.4;text-align:center;flex-shrink:0;width:100%;padding-left:clamp(0%, calc(13% + (100vw - 1440px) * 0.0116), 30%);padding-right:clamp(0%, calc(13% + (100vw - 1440px) * 0.0116), 30%);box-sizing:border-box}
+.modal-text img{border-radius:8px;max-width:100%;height:auto;display:block;margin:0 auto}
 .modal-text li{margin:4px 0}
 .modal-text blockquote{border-left:4px solid #FFD700;margin:8px 0 8px 20px;padding:4px 16px;color:#ccc;font-style:italic}
 .yt-wrap{width:100%;max-width:560px;flex-shrink:0}
@@ -730,7 +730,7 @@ function setModalContent(q,phase){
   function makeImg(src){
     var img=document.createElement('img');
     img.className='modal-img';img.alt='';
-    img.style.width='100%';img.style.height='auto';img.style.flex='0 0 auto';
+    img.style.width='100%';img.style.height='auto';img.style.flex='0 0 auto';img.style.borderRadius='8px';
     img.src=src;
     img.onload=function(){
       var landscape=img.naturalWidth>=img.naturalHeight;
