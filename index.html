@@ -736,7 +736,7 @@ function setModalContent(q,phase){
       var landscape=img.naturalWidth>=img.naturalHeight;
       if(!landscape){
         img.style.width='auto';img.style.maxWidth='100%';
-        img.style.flex='1';img.style.minHeight='0';img.style.height='100%';
+        img.style.flex='1';img.style.minHeight='0';img.style.height='100%';img.style.borderRadius='8px';
       }
       requestAnimationFrame(function(){
         try{
