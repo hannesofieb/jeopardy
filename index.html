@@ -28,6 +28,16 @@ body{height:100vh;overflow:hidden;background:linear-gradient(135deg,#0a0a1a 0%,#
 .btn-play:active{transform:scale(.95)}
 .btn-edit{padding:10px 20px;font-size:16px;font-family:'Bebas Neue',Impact,sans-serif;letter-spacing:2px;background:linear-gradient(135deg,#1a3a8a,#0a1a4a);border:2px solid #3366cc;border-radius:4px;color:#FFD700;cursor:pointer;transition:transform .1s}
 .btn-edit:active{transform:scale(.95)}
+.btn-share{padding:10px 16px;font-size:16px;font-family:'Bebas Neue',Impact,sans-serif;letter-spacing:2px;background:transparent;border:2px solid #3366cc;border-radius:4px;color:#aac;cursor:pointer;transition:transform .1s}
+.btn-share:hover{border-color:#FFD700;color:#FFD700}
+.btn-share:active{transform:scale(.95)}
+.import-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;margin-top:12px;padding:14px 20px;font-size:18px;font-family:'Bebas Neue',Impact,sans-serif;letter-spacing:2px;background:transparent;border:2px dashed #555;border-radius:8px;color:#888;cursor:pointer;transition:transform .1s}
+.import-btn:hover{border-color:#FFD700;color:#FFD700}
+.import-btn:active{transform:scale(.98)}
+.share-popup{width:480px}
+.share-file{font-size:15px;font-family:system-ui,sans-serif;color:#ddd;margin-bottom:16px;word-break:break-all}
+.share-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.share-big{flex:1;padding:12px 16px;font-size:17px}
 .btn-del{padding:10px 14px;font-size:16px;background:rgba(139,0,0,.5);border:2px solid #8B0000;border-radius:4px;color:#FF6B6B;cursor:pointer;transition:transform .1s}
 .btn-del:active{transform:scale(.95)}
 
@@ -258,6 +268,8 @@ body.tv .play-cell{pointer-events:none}
       <p class="subtitle">Game Creator</p>
     </div>
     <button class="create-btn" onclick="createNewGame()">+ Create New Game</button>
+    <button class="import-btn" onclick="document.getElementById('import-file').click()">⇩ Import game from file</button>
+    <input type="file" id="import-file" accept=".json,application/json" multiple style="display:none" onchange="importGames(event)">
     <div id="games-section" class="games-section hidden">
       <h2 class="section-title">Your Games</h2>
       <div id="games-list" class="games-list"></div>
@@ -477,6 +489,19 @@ body.tv .play-cell{pointer-events:none}
 </div>
 <button id="show-ans-btn" class="show-ans-btn hidden" onclick="showAnswer()">Show Answer</button>
 <button id="submit-scores-btn" class="submit-scores-btn hidden" onclick="submitScores(awardedTo)">Submit Scores</button>
+<div id="share-overlay" class="overlay hidden" onclick="closeShare()"></div>
+<div id="share-popup" class="edit-popup share-popup hidden">
+  <div class="popup-header">
+    <span class="popup-pts">Share game</span>
+    <button class="discard-btn" onclick="closeShare()">✕ Close</button>
+  </div>
+  <p id="share-file" class="share-file"></p>
+  <div class="share-actions">
+    <button class="save-q-btn share-big" onclick="downloadShare()">⬇ Download file</button>
+    <button id="share-native-btn" class="preview-btn share-big hidden" onclick="nativeShare()">📤 Share…</button>
+  </div>
+  <p class="mp-hint">The file contains every question, answer, image and video link. Send it any way you like (email, Messages, Google Drive, AirDrop). The other person opens the Jeopardy page and clicks “Import game from file”.</p>
+</div>
 <div id="toast" class="toast"></div>
 
 <script>
@@ -1156,7 +1181,7 @@ function renderGameList(){
   var sec=document.getElementById('games-section'),list=document.getElementById('games-list');
   if(!games.length){sec.classList.add('hidden');return;}
   sec.classList.remove('hidden');
-  list.innerHTML=games.map(function(g){return '<div class="game-card"><div><h3 class="game-title">'+esc(g.title)+'</h3><p class="game-date">'+new Date(g.createdAt).toLocaleDateString()+'</p></div><div class="game-actions"><button class="btn-play" onclick="loadGame(\''+g.id+'\',\'play\')">▶ Play</button><button class="btn-edit" onclick="loadGame(\''+g.id+'\',\'edit\')">✎ Edit</button><button class="btn-del" onclick="delGame(\''+g.id+'\')">✕</button></div></div>';}).join('');
+  list.innerHTML=games.map(function(g){return '<div class="game-card"><div><h3 class="game-title">'+esc(g.title)+'</h3><p class="game-date">'+new Date(g.createdAt).toLocaleDateString()+'</p></div><div class="game-actions"><button class="btn-play" onclick="loadGame(\''+g.id+'\',\'play\')">▶ Play</button><button class="btn-edit" onclick="loadGame(\''+g.id+'\',\'edit\')">✎ Edit</button><button class="btn-share" onclick="shareGame(\''+g.id+'\')">⇪ Share</button><button class="btn-del" onclick="delGame(\''+g.id+'\')">✕</button></div></div>';}).join('');
 }
 
 function createNewGame(){currentGame=mkGame();imgCache={};showView('edit');renderEditBoard();document.getElementById('game-title-input').value=currentGame.title;}
@@ -1164,7 +1189,8 @@ function createNewGame(){currentGame=mkGame();imgCache={};showView('edit');rende
 async function loadGame(id,mode){
   var g=games.find(function(x){return x.id===id;});if(!g)return;
   currentGame=JSON.parse(JSON.stringify(g));
-  currentGame.categories.forEach(function(cat){cat.questions.forEach(migrateQuestion);});
+  // migrate + make every question's value follow the current PTS row values
+  currentGame.categories.forEach(function(cat){cat.questions.forEach(function(q,qi){migrateQuestion(q);q.points=PTS[qi];});});
   imgCache=await loadImagesForGame(currentGame);
   if(mode==='play'){
     currentGame.categories.forEach(function(cat){cat.questions.forEach(function(q){q.answered=false;});});
@@ -1208,6 +1234,91 @@ async function saveCurrentGame(){
     sp.classList.add('hidden');ico.classList.remove('hidden');tx.textContent='Failed';btn.disabled=false;
     setTimeout(function(){tx.textContent='Save Game';},2000);
   }
+}
+
+// ══════════════════════════════════════════════
+//  SHARE / EXPORT / IMPORT
+// ══════════════════════════════════════════════
+var shareFile=null,shareTitle='';
+function fmtSize(b){return b>1048576?(b/1048576).toFixed(1)+' MB':Math.max(1,Math.round(b/1024))+' KB';}
+async function buildExport(id){
+  var g=games.find(function(x){return x.id===id;});if(!g)return null;
+  var copy=JSON.parse(JSON.stringify(g));
+  var cache=await loadImagesForGame(copy);
+  copy.categories.forEach(function(c){c.questions.forEach(function(q){
+    if(q.mediaRef&&q.mediaRef.startsWith('idb:'))q.mediaRef=cache[q.mediaRef.slice(4)]||null;
+    q.answered=false;
+  });});
+  var data={app:'jeopardy-game',version:1,exportedAt:new Date().toISOString(),game:copy};
+  var name=(copy.title||'game').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-')||'game';
+  shareTitle=copy.title||'Jeopardy game';
+  return new File([JSON.stringify(data)],name+'.jeopardy.json',{type:'application/json'});
+}
+async function shareGame(id){
+  shareFile=await buildExport(id);if(!shareFile)return;
+  document.getElementById('share-file').textContent='📄 '+shareFile.name+' ('+fmtSize(shareFile.size)+')';
+  var canNative=false;
+  try{canNative=!!(navigator.canShare&&navigator.canShare({files:[shareFile]}));}catch(e){}
+  document.getElementById('share-native-btn').classList.toggle('hidden',!canNative);
+  document.getElementById('share-overlay').classList.remove('hidden');
+  document.getElementById('share-popup').classList.remove('hidden');
+}
+function closeShare(){
+  document.getElementById('share-overlay').classList.add('hidden');
+  document.getElementById('share-popup').classList.add('hidden');
+}
+function downloadShare(){
+  if(!shareFile)return;
+  var url=URL.createObjectURL(shareFile),a=document.createElement('a');
+  a.href=url;a.download=shareFile.name;document.body.appendChild(a);a.click();a.remove();
+  setTimeout(function(){URL.revokeObjectURL(url);},2000);
+  showToast('Downloaded '+shareFile.name);
+}
+async function nativeShare(){
+  if(!shareFile)return;
+  try{await navigator.share({files:[shareFile],title:shareTitle});}catch(e){}
+}
+function blankQuestion(p){return{points:p,questionHtml:'',answerHtml:'',mediaRef:null,mediaVideo:null,mediaVideoA:null,showMediaInQ:true,showMediaInA:false,answered:false};}
+async function importGames(e){
+  var files=Array.prototype.slice.call(e.target.files);e.target.value='';
+  var added=[],failed=[];
+  for(var fi=0;fi<files.length;fi++){
+    try{
+      var data=JSON.parse(await files[fi].text());
+      var g=data&&data.game?data.game:data;
+      if(!g||!Array.isArray(g.categories)||!g.categories.length)throw new Error('not a game');
+      g.id=''+Date.now()+Math.floor(Math.random()*1000);
+      g.title=g.title||'Imported game';
+      g.createdAt=new Date().toISOString();
+      g.categories=g.categories.slice(0,NCATS);
+      for(var ci=0;ci<g.categories.length;ci++){
+        var c=g.categories[ci];
+        c.name=c.name||'Category '+(ci+1);
+        c.questions=Array.isArray(c.questions)?c.questions.slice(0,PTS.length):[];
+        for(var qi=0;qi<PTS.length;qi++){
+          var q=c.questions[qi];
+          if(!q||typeof q!=='object'){q=blankQuestion(PTS[qi]);c.questions[qi]=q;}
+          q.points=PTS[qi];
+          migrateQuestion(q);q.answered=false;
+          if(q.mediaRef&&q.mediaRef.startsWith('idb:'))q.mediaRef=null;
+          if(q.mediaRef&&q.mediaRef.startsWith('data:')){
+            var k=idbImgKey(g.id,ci,qi);await idbPut(k,q.mediaRef);q.mediaRef='idb:'+k;
+          }
+        }
+      }
+      while(g.categories.length<NCATS){
+        g.categories.push({name:'Category '+(g.categories.length+1),questions:PTS.map(blankQuestion)});
+      }
+      games.push(g);added.push(g);
+    }catch(err){failed.push(files[fi].name);}
+  }
+  if(added.length){
+    try{saveGames();}
+    catch(err){games=games.filter(function(g){return added.indexOf(g)<0;});pruneIDB();renderGameList();return;}
+  }
+  renderGameList();
+  if(added.length)showToast('Imported '+(added.length===1?'“'+added[0].title+'”':added.length+' games'));
+  if(failed.length)alert('Could not import: '+failed.join(', ')+'\nThe file needs to be a game exported with the Share button.');
 }
 
 function goHome(){
