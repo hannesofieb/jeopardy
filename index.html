@@ -636,14 +636,19 @@ function tvShowQ(q,phase){
 let idb=null;
 function openIDB(){
   return new Promise(function(res,rej){
-    var req=indexedDB.open('jeopardy-images',1);
-    req.onupgradeneeded=function(e){e.target.result.createObjectStore('imgs');};
+    // v2 adds a 'games' store next to the existing 'imgs' store (images are untouched)
+    var req=indexedDB.open('jeopardy-images',2);
+    req.onupgradeneeded=function(e){
+      var db=e.target.result;
+      if(!db.objectStoreNames.contains('imgs'))db.createObjectStore('imgs');
+      if(!db.objectStoreNames.contains('games'))db.createObjectStore('games');
+    };
     req.onsuccess=function(e){idb=e.target.result;res(idb);};
     req.onerror=rej;
   });
 }
-function idbPut(k,v){return new Promise(function(res,rej){var tx=idb.transaction('imgs','readwrite');tx.objectStore('imgs').put(v,k);tx.oncomplete=res;tx.onerror=rej;});}
-function idbGet(k){return new Promise(function(res,rej){var tx=idb.transaction('imgs','readonly');var r=tx.objectStore('imgs').get(k);r.onsuccess=function(){res(r.result);};r.onerror=rej;});}
+function idbPut(k,v,store){store=store||'imgs';return new Promise(function(res,rej){var tx=idb.transaction(store,'readwrite');tx.objectStore(store).put(v,k);tx.oncomplete=res;tx.onerror=function(){rej(tx.error);};tx.onabort=function(){rej(tx.error);};});}
+function idbGet(k,store){store=store||'imgs';return new Promise(function(res,rej){var tx=idb.transaction(store,'readonly');var r=tx.objectStore(store).get(k);r.onsuccess=function(){res(r.result);};r.onerror=rej;});}
 function idbDel(k){return new Promise(function(res,rej){var tx=idb.transaction('imgs','readwrite');tx.objectStore('imgs').delete(k);tx.oncomplete=res;tx.onerror=rej;});}
 function idbKeys(){return new Promise(function(res,rej){var tx=idb.transaction('imgs','readonly');var r=tx.objectStore('imgs').getAllKeys();r.onsuccess=function(){res(r.result);};r.onerror=rej;});}
 function idbImgKey(gid,ci,qi){return gid+'_'+ci+'_'+qi;}
@@ -1115,7 +1120,8 @@ function handlePaste(e,id){
 // ══════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded',async function(){
   if(IS_TV){initTV();return;}
-  await openIDB();loadGames();
+  try{await openIDB();}catch(e){idb=null;console.warn('IndexedDB unavailable, falling back to localStorage',e);}
+  await loadGames();
 });
 document.addEventListener('keydown',function(e){
   if(IS_TV)return;
@@ -1170,10 +1176,36 @@ function migrateQuestion(q){
   if(!q.answerHtml&&q.answer){q.answerHtml=esc(q.answer);delete q.answer;}
 }
 
-function loadGames(){var s=localStorage.getItem('jeopardy-games');if(s)games=JSON.parse(s);renderGameList();}
-function saveGames(){
-  try{localStorage.setItem('jeopardy-games',JSON.stringify(games));}
-  catch(e){alert('Save failed: storage quota exceeded.');throw e;}
+// Games are stored in IndexedDB ('games' store, key 'list').
+// The first time this version runs, games found in localStorage are copied over.
+// The old localStorage copy is left in place as a backup but is no longer used.
+async function loadGames(){
+  var legacy=localStorage.getItem('jeopardy-games');
+  if(idb){
+    try{
+      var stored=await idbGet('list','games');
+      if(Array.isArray(stored)){games=stored;}
+      else if(legacy){
+        games=JSON.parse(legacy);
+        await idbPut('list',games,'games');
+        localStorage.setItem('jeopardy-games-migrated',new Date().toISOString());
+      }
+    }catch(e){console.warn('Could not read games from IndexedDB',e);if(legacy)games=JSON.parse(legacy);}
+    // ask the browser not to clear this site's storage when space runs low
+    try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}
+  } else if(legacy){
+    games=JSON.parse(legacy);
+  }
+  renderGameList();
+}
+async function saveGames(){
+  try{
+    if(idb)await idbPut('list',games,'games');
+    else localStorage.setItem('jeopardy-games',JSON.stringify(games));
+  }catch(e){
+    alert('Save failed: the browser could not store the games ('+(e&&e.name?e.name:'unknown error')+'). Try freeing up disk space, or export your games with Share as a backup.');
+    throw e;
+  }
 }
 function esc(t){var d=document.createElement('div');d.textContent=t;return d.innerHTML;}
 
@@ -1207,7 +1239,7 @@ async function playCurrentGame(){
 }
 
 function delGame(id){
-  if(confirm('Delete this game?')){games=games.filter(function(g){return g.id!==id;});saveGames();pruneIDB();renderGameList();}
+  if(confirm('Delete this game?')){games=games.filter(function(g){return g.id!==id;});saveGames().then(pruneIDB).catch(function(){});renderGameList();}
 }
 
 async function saveCurrentGame(){
@@ -1227,7 +1259,7 @@ async function saveCurrentGame(){
     var i=games.findIndex(function(g){return g.id===currentGame.id;});
     if(i>=0)games[i]=currentGame;else games.push(currentGame);
     await new Promise(function(r){setTimeout(r,200);});
-    saveGames();
+    await saveGames();
     sp.classList.add('hidden');ico.classList.remove('hidden');ico.textContent='✓';tx.textContent='Saved!';
     setTimeout(function(){ico.textContent='💾';tx.textContent='Save Game';btn.disabled=false;},2000);
   }catch(e){
@@ -1313,7 +1345,7 @@ async function importGames(e){
     }catch(err){failed.push(files[fi].name);}
   }
   if(added.length){
-    try{saveGames();}
+    try{await saveGames();}
     catch(err){games=games.filter(function(g){return added.indexOf(g)<0;});pruneIDB();renderGameList();return;}
   }
   renderGameList();
